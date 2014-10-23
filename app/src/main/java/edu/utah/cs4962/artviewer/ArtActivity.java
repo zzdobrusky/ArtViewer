@@ -18,6 +18,27 @@ public class ArtActivity extends Activity {
     {
         super.onCreate(savedInstanceState);
 
+        // Add test info
+        Art mona = new Art();
+        mona.name = "Mona Lisa";
+        mona.image = R.drawable.mona;
+        ArtCollection.getInstance().addArt(mona);
+
+        Art girl1 = new Art();
+        girl1.name = "girl1";
+        girl1.image = R.drawable.girl1;
+        ArtCollection.getInstance().addArt(girl1);
+
+        Art girl2 = new Art();
+        girl2.name = "girl2";
+        girl2.image = R.drawable.girl2;
+        ArtCollection.getInstance().addArt(girl2);
+
+        Art girl3 = new Art();
+        girl3.name = "girl3";
+        girl3.image = R.drawable.girl3;
+        ArtCollection.getInstance().addArt(girl3);
+
         LinearLayout rootLayout = new LinearLayout(this);
         rootLayout.setOrientation(LinearLayout.HORIZONTAL);
         setContentView(rootLayout);

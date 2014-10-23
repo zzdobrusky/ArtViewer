@@ -8,12 +8,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created by zbynek on 10/22/2014.
  */
 public class ArtListFragment extends Fragment implements ListAdapter
 {
+    UUID[] _artIdentifiersByName = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
@@ -23,15 +29,75 @@ public class ArtListFragment extends Fragment implements ListAdapter
     }
 
     @Override
+    public boolean isEmpty()
+    {
+        return getCount() <= 0;
+    }
+
+    @Override
+    public int getCount()
+    {
+        return ArtCollection.getInstance().getIdentifiers().size();
+    }
+
+    @Override
+    public boolean hasStableIds()
+    {
+        return true;
+    }
+
+    @Override
+    public Object getItem(int i)
+    {
+        if(_artIdentifiersByName == null)
+        {
+            Set<UUID> artIdentifiers = ArtCollection.getInstance().getIdentifiers();
+            // TODO: Order list
+            _artIdentifiersByName = artIdentifiers.toArray(new UUID[artIdentifiers.size()]);
+        }
+        return _artIdentifiersByName[(int)getItemId(i)];
+    }
+
+    @Override
+    public long getItemId(int i)
+    {
+        return i;
+    }
+
+    @Override
+    public View getView(int i, View view, ViewGroup viewGroup)
+    {
+        UUID artIdentifier = (UUID)getItem(i); //(UUID)_artIdentifiersByName[(int)getItemId(i)];
+        Art art = ArtCollection.getInstance().getArt(artIdentifier);
+
+        TextView artTitleView = new TextView(getActivity());
+        artTitleView.setText(art.name);
+
+        return artTitleView;
+    }
+
+    @Override
+    public int getViewTypeCount()
+    {
+        return 1;
+    }
+
+    @Override
+    public int getItemViewType(int i)
+    {
+        return 0;
+    }
+
+    @Override
     public boolean areAllItemsEnabled()
     {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled(int i)
     {
-        return false;
+        return true;
     }
 
     @Override
@@ -46,51 +112,5 @@ public class ArtListFragment extends Fragment implements ListAdapter
 
     }
 
-    @Override
-    public int getCount()
-    {
-        return 0;
-    }
 
-    @Override
-    public Object getItem(int i)
-    {
-        return null;
-    }
-
-    @Override
-    public long getItemId(int i)
-    {
-        return 0;
-    }
-
-    @Override
-    public boolean hasStableIds()
-    {
-        return false;
-    }
-
-    @Override
-    public View getView(int i, View view, ViewGroup viewGroup)
-    {
-        return null;
-    }
-
-    @Override
-    public int getItemViewType(int i)
-    {
-        return 0;
-    }
-
-    @Override
-    public int getViewTypeCount()
-    {
-        return 0;
-    }
-
-    @Override
-    public boolean isEmpty()
-    {
-        return false;
-    }
 }
