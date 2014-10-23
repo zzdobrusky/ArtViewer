@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import java.util.UUID;
+
 
 public class ArtActivity extends Activity {
 
@@ -61,9 +63,23 @@ public class ArtActivity extends Activity {
         );
         rootLayout.addView(artDetailLayout, artDetailLayoutLP);
 
+
+        ArtListFragment artListFragment = new ArtListFragment();
+        final ArtDetailFragment artDetailFragment =  new ArtDetailFragment();
+        artListFragment.setOnArtSelectedListener(new ArtListFragment.OnArtSelectedListener()
+        {
+            @Override
+            public void onArtSelected(ArtListFragment artListFragment, UUID identifier)
+            {
+                // update detail fragment
+                artDetailFragment.setArtDetailIdentifier(identifier);
+            }
+        });
+
+
         FragmentTransaction addTransaction = getFragmentManager().beginTransaction();
-        addTransaction.add(10, new ArtListFragment());
-        addTransaction.add(20, new ArtDetailFragment());
+        addTransaction.add(10, artListFragment);
+        addTransaction.add(20, artDetailFragment);
         addTransaction.commit();
     }
 }

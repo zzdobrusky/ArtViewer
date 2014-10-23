@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -19,14 +20,42 @@ import java.util.UUID;
 public class ArtListFragment extends Fragment implements ListAdapter
 {
     UUID[] _artIdentifiersByName = null;
+    public interface OnArtSelectedListener
+    {
+        public void onArtSelected(ArtListFragment artListFragment, UUID identifier);
+    }
+    OnArtSelectedListener _onArtSelectedListener = null;
+
+    public OnArtSelectedListener getOnArtSelectedListener()
+    {
+        return _onArtSelectedListener;
+    }
+
+    public void setOnArtSelectedListener(OnArtSelectedListener onArtSelectedListener)
+    {
+        _onArtSelectedListener = onArtSelectedListener;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         ListView artListView = new ListView(getActivity());
         artListView.setAdapter(this);
+
+        artListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+            {
+                if(_onArtSelectedListener != null)
+                    _onArtSelectedListener.onArtSelected(ArtListFragment.this, (UUID) getItem(i));
+            }
+        });
+
         return artListView;
     }
+
+
 
     @Override
     public boolean isEmpty()
@@ -67,7 +96,7 @@ public class ArtListFragment extends Fragment implements ListAdapter
     @Override
     public View getView(int i, View view, ViewGroup viewGroup)
     {
-        UUID artIdentifier = (UUID)getItem(i); //(UUID)_artIdentifiersByName[(int)getItemId(i)];
+        UUID artIdentifier = (UUID)getItem(i);
         Art art = ArtCollection.getInstance().getArt(artIdentifier);
 
         TextView artTitleView = new TextView(getActivity());
