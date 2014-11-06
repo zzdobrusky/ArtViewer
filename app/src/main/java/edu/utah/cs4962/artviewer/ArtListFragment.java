@@ -2,6 +2,7 @@ package edu.utah.cs4962.artviewer;
 
 import android.app.Fragment;
 import android.database.DataSetObserver;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class ArtListFragment extends Fragment implements ListAdapter
 {
     UUID[] _artIdentifiersByName = null;
+    int _currentPosition = -1;
     public interface OnArtSelectedListener
     {
         public void onArtSelected(ArtListFragment artListFragment, UUID identifier);
@@ -39,7 +41,7 @@ public class ArtListFragment extends Fragment implements ListAdapter
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        ListView artListView = new ListView(getActivity());
+        final ListView artListView = new ListView(getActivity());
         artListView.setAdapter(this);
 
         artListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -47,6 +49,8 @@ public class ArtListFragment extends Fragment implements ListAdapter
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
             {
+                _currentPosition = i;
+                artListView.invalidateViews();
                 if(_onArtSelectedListener != null)
                     _onArtSelectedListener.onArtSelected(ArtListFragment.this, (UUID) getItem(i));
             }
@@ -101,6 +105,8 @@ public class ArtListFragment extends Fragment implements ListAdapter
 
         TextView artTitleView = new TextView(getActivity());
         artTitleView.setText(art.name);
+        if(i == _currentPosition)
+            artTitleView.setBackgroundColor(Color.LTGRAY);
 
         return artTitleView;
     }

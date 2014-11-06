@@ -1,11 +1,8 @@
 package edu.utah.cs4962.artviewer;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -41,6 +38,9 @@ public class ArtActivity extends Activity {
         girl3.image = R.drawable.girl3;
         ArtCollection.getInstance().addArt(girl3);
 
+
+        ArtCollection.getInstance().scrapeArt("http://www.nytimes.com");
+
         LinearLayout rootLayout = new LinearLayout(this);
         rootLayout.setOrientation(LinearLayout.HORIZONTAL);
         setContentView(rootLayout);
@@ -66,6 +66,15 @@ public class ArtActivity extends Activity {
 
         ArtListFragment artListFragment = new ArtListFragment();
         final ArtDetailFragment artDetailFragment =  new ArtDetailFragment();
+
+
+
+        FragmentTransaction addTransaction = getFragmentManager().beginTransaction();
+        addTransaction.add(10, artListFragment);
+        addTransaction.add(20, artDetailFragment);
+
+        addTransaction.commit();
+
         artListFragment.setOnArtSelectedListener(new ArtListFragment.OnArtSelectedListener()
         {
             @Override
@@ -75,11 +84,5 @@ public class ArtActivity extends Activity {
                 artDetailFragment.setArtDetailIdentifier(identifier);
             }
         });
-
-
-        FragmentTransaction addTransaction = getFragmentManager().beginTransaction();
-        addTransaction.add(10, artListFragment);
-        addTransaction.add(20, artDetailFragment);
-        addTransaction.commit();
     }
 }
