@@ -1,5 +1,7 @@
 package edu.utah.cs4962.artviewer;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -11,7 +13,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,9 +31,37 @@ public class ArtCollection
     static ArtCollection getInstance()
     {
         if (_instance == null)
-            _instance = new ArtCollection();
+        {
+            synchronized (ArtCollection.class)
+            {
+                if(_instance == null)
+                    _instance = new ArtCollection();
+            }
+        }
+
         return _instance;
     }
+
+    //region listeners
+
+    public interface OnArtChangedListener
+    {
+        public void onArtChanged();
+    }
+
+    OnArtChangedListener _onArtChangedListener = null;
+
+    public OnArtChangedListener getOnArtChangedListener()
+    {
+        return _onArtChangedListener;
+    }
+
+    public void setOnArtChangedListener(OnArtChangedListener _onArtChangedListener)
+    {
+        this._onArtChangedListener = _onArtChangedListener;
+    }
+
+    //endregion
 
     private ArtCollection()
     {
@@ -53,11 +82,17 @@ public class ArtCollection
         UUID identifier = UUID.randomUUID();
         art.identifier = identifier;
         _art.put(identifier, art);
+
+        if(_onArtChangedListener != null)
+            _onArtChangedListener.onArtChanged();
     }
 
     public void removeArt(UUID identifier)
     {
         _art.remove(identifier);
+
+        if(_onArtChangedListener != null)
+            _onArtChangedListener.onArtChanged();
     }
 
     public void scrapeArt(String uriString)
@@ -81,7 +116,12 @@ public class ArtCollection
 
                     InputStream contentStream = response.getEntity().getContent();
                     Scanner contentScanner = new Scanner(contentStream).useDelimiter("\\A");
-                    contentString = contentScanner.hasNext() ? contentScanner.next() : null;
+                    //contentString = contentScanner.hasNext() ? contentScanner.next() : null;
+                    if(contentScanner.hasNext())
+                        contentString = contentScanner.next();
+                    else
+                        contentString = null;
+
                     Log.i("Network", contentString);
                 }
                 catch (IOException e)
@@ -135,10 +175,65 @@ public class ArtCollection
             }
 
             @Override
-            protected void onPostExecute(URI[] uriStrings)
+            protected void onPostExecute(URI[] imageUris)
             {
-                super.onPostExecute(uriStrings);
+                super.onPostExecute(imageUris);
+
+                final AsyncTask<URI, Integer, Bitmap[]> bitmapDownloadTask = new AsyncTask<URI, Integer, Bitmap[]>()
+                {
+                    @Override
+                    protected Bitmap[] doInBackground(URI... bitmapUris)
+                    {
+                        ArrayList<Bitmap> bitmaps = new ArrayList<Bitmap>();
+                        for (URI bitmapUri : bitmapUris)
+                        {
+                            try
+                            {
+                                HttpClient client = new DefaultHttpClient();
+                                HttpGet request = new HttpGet(bitmapUri);
+                                HttpResponse response = client.execute(request);
+
+                                InputStream content = response.getEntity().getContent();
+                                Bitmap bitmap = BitmapFactory.decodeStream(content);
+                                if(bitmap != null)
+                                {
+                                    bitmaps.add(bitmap);
+                                    publishProgress(bitmaps.size());
+                                }
+                            }
+                            catch (IOException e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        return bitmaps.toArray(new Bitmap[bitmaps.size()]);
+                    }
+
+                    @Override
+                    protected void onProgressUpdate(Integer... values)
+                    {
+                        super.onProgressUpdate(values);
+                    }
+
+                    @Override
+                    protected void onPostExecute(Bitmap[] bitmaps)
+                    {
+                        super.onPostExecute(bitmaps);
+
+                        for (Bitmap bitmap : bitmaps)
+                        {
+                            Art art = new Art();
+                            art.name = "nytimes.com bitmap";
+                            art.image = bitmap;
+                            addArt(art);
+                        }
+                    }
+                };
+
+                bitmapDownloadTask.execute(imageUris);
             }
+
         };
 
         imageScrapeTask.execute(uriString);

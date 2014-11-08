@@ -56,6 +56,19 @@ public class ArtListFragment extends Fragment implements ListAdapter
             }
         });
 
+        ArtCollection.getInstance().setOnArtChangedListener(new ArtCollection.OnArtChangedListener()
+        {
+            @Override
+            public void onArtChanged()
+            {
+                Set<UUID> artIdentifiers = ArtCollection.getInstance().getIdentifiers();
+                // TODO: order list
+                _artIdentifiersByName = artIdentifiers.toArray(new UUID[artIdentifiers.size()]);
+
+                artListView.invalidateViews();
+            }
+        });
+
         return artListView;
     }
 

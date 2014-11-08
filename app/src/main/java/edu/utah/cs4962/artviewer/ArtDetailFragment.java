@@ -32,7 +32,7 @@ public class ArtDetailFragment extends Fragment
         if(_artDetailView == null)
             return;
 
-        int artResourceIdentifier = ArtCollection.getInstance().getArt(identifier).image;
-        _artDetailView.setImageResource(artResourceIdentifier);
+        Art art = ArtCollection.getInstance().getArt(identifier);
+        _artDetailView.setImageBitmap(art.image);
     }
 }

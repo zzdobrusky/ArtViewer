@@ -2,6 +2,7 @@ package edu.utah.cs4962.artviewer;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -20,22 +21,22 @@ public class ArtActivity extends Activity {
         // Add test info
         Art mona = new Art();
         mona.name = "Mona Lisa";
-        mona.image = R.drawable.mona;
+        mona.image = BitmapFactory.decodeResource(getResources(), R.drawable.mona);
         ArtCollection.getInstance().addArt(mona);
 
         Art girl1 = new Art();
         girl1.name = "girl1";
-        girl1.image = R.drawable.girl1;
+        girl1.image = BitmapFactory.decodeResource(getResources(), R.drawable.girl1);
         ArtCollection.getInstance().addArt(girl1);
 
         Art girl2 = new Art();
         girl2.name = "girl2";
-        girl2.image = R.drawable.girl2;
+        girl2.image = BitmapFactory.decodeResource(getResources(), R.drawable.girl2);
         ArtCollection.getInstance().addArt(girl2);
 
         Art girl3 = new Art();
         girl3.name = "girl3";
-        girl3.image = R.drawable.girl3;
+        girl3.image = BitmapFactory.decodeResource(getResources(), R.drawable.girl3);
         ArtCollection.getInstance().addArt(girl3);
 
 

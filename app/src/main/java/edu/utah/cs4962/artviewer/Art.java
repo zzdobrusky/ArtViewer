@@ -11,5 +11,5 @@ public class Art
 {
     public UUID identifier;
     public String name;
-    public int image;
+    public Bitmap image;
 }
